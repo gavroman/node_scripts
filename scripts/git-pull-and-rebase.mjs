@@ -1,11 +1,16 @@
 #!/usr/bin/env zx
 import 'zx/globals'
 
-cd(path.resolve(os.homedir(), 'work/projects/frozen'));
+cd(path.resolve(os.homedir(), '/Users/gavroman/arcadia/market/front/apps/marketfront'));
 
-const initialBranch = await $`git branch --show-current`;
+const branchOutput = await $`arc branch --json`;
+const branches = JSON.parse(branchOutput);
+const initialBranch = branches.find(({current}) => current)?.name;
+if (!initialBranch) {
+    throw new Error('No current branch:\n' + branchOutput);
+}
 
-await $`git checkout master`;
-await $`git pull`;
-await $`git checkout ${initialBranch}`;
-await $`git rebase master --no-commit`;
+await $`arc checkout trunk`;
+await $`arc pull`;
+await $`arc checkout ${initialBranch}`;
+await $`arc rebase trunk`;
